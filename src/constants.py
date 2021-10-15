@@ -1,0 +1,9 @@
+# Screen and game settings
+SCREEN_SIZE = (640, 480)
+FPS = 30
+GAME_NAME = 'Frog TD'
+
+# Colors
+CONSTRUCTABLE_PATH_COLOR = (130, 76, 48)
+ENEMY_PATH_COLOR = (201, 154, 118)
+BACKGROUND_COLOR = (27, 114, 5)
