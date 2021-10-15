@@ -1,46 +1,33 @@
-from enum import Enum
-
 import pygame as pg
 
 import constants
+from state import CellState
 from tower import Tower
-
-
-class CellState(Enum):
-    ENEMY = 'enemy'
-    TOWER = 'tower'
-    CONSTRUCTABLE_PATH = 'constructable_path'
-    ENEMY_PATH = 'enemy_path'
-    OBSTACLE = 'obstacle'
-
-
-def default_cell_state() -> CellState:
-    return CellState.CONSTRUCTABLE_PATH
 
 
 class Cell:
     def __init__(self, size: int, index: tuple[int, int], initial_state=None):
-        self.state = initial_state if initial_state is not None else default_cell_state()
+        self.state = initial_state if initial_state is not None else CellState.default_cell_state()
         self.size = size
         self.index = index
         self.sprite = None
 
     def display(self, surf: pg.Surface):
         pos = (self.index[1] * self.size, self.index[0] * self.size)
+
+        color = constants.CONSTRUCTABLE_PATH_COLOR
+        if self.state == CellState.OBSTACLE:
+            color = constants.BACKGROUND_COLOR
+        elif self.state == CellState.ENEMY_PATH:
+            color = constants.ENEMY_PATH_COLOR
+
+        rect = pg.Rect(pos, (self.size, self.size))
+        pg.draw.rect(surf, color, rect)
+
         if self.state == CellState.TOWER:
             surf.blit(self.sprite, pos)
         elif self.state == CellState.ENEMY:
             raise NotImplementedError()
-        else:
-            if self.state == CellState.CONSTRUCTABLE_PATH:
-                color = constants.CONSTRUCTABLE_PATH_COLOR
-            elif self.state == CellState.OBSTACLE:
-                color = constants.BACKGROUND_COLOR
-            elif self.state == CellState.ENEMY_PATH:
-                color = constants.ENEMY_PATH_COLOR
-
-            rect = pg.Rect(pos, (self.size, self.size))
-            pg.draw.rect(surf, color, rect)
 
     def build_tower(self, tower: Tower):
         self.sprite = tower.main_sprite
@@ -79,6 +66,8 @@ class Grid:
 
     def get_cell_at(self, pos: tuple[int, int]) -> tuple[int, int]:
         x, y = pos
+        if x > constants.SCREEN_SIZE[0] or y > constants.SCREEN_SIZE[1]:
+            return (None, None)
 
         col = round(((x - self.cell_size / 2) /
                     constants.SCREEN_SIZE[0]) * self.NUM_COLS)
@@ -88,9 +77,13 @@ class Grid:
         return (row, col)
 
     def is_cell_available_to_build(self, row, col) -> bool:
+        if row is None and col is None:
+            return False
         return self.grid[row][col].state == CellState.CONSTRUCTABLE_PATH
 
     def show_tower(self, surf: pg.Surface, tower: Tower, row: int, col: int):
+        if row is None and col is None:
+            return
         x, y = col * self.cell_size, row * self.cell_size
 
         if self.is_cell_available_to_build(row, col):
@@ -101,6 +94,8 @@ class Grid:
         surf.blit(sprite, (x, y))
 
     def build_tower(self, row: int, col: int, tower: Tower):
+        if row is None and col is None:
+            return
         self.grid[row][col].build_tower(tower)
 
     def highlight_cell(self, surf: pg.Surface, pos: tuple[int, int]):
