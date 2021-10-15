@@ -8,7 +8,7 @@ from state import GameState
 
 
 def main():
-    game = Game(constants.GAME_NAME)
+    game = Game(constants.GAME_NAME, starting_coins=600)
 
     while 1:
         for event in pg.event.get():

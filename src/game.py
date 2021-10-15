@@ -8,7 +8,7 @@ from ui import UI
 
 
 class Game:
-    def __init__(self, game_name: str):
+    def __init__(self, game_name: str, starting_coins=200):
         print("[Initializing] Starting Pygame...")
         pg.init()
 
@@ -37,7 +37,7 @@ class Game:
         self.state = GameState.SETUP_PHASE
         self.rounds_complete = 0
 
-        self.available_coins = 200
+        self.available_coins = starting_coins
 
         print("[Initializing] Loading tower images...")
         self.towers = self.initialize_tower_images()
