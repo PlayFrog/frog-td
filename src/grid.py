@@ -43,7 +43,6 @@ class Cell:
             pg.draw.rect(surf, color, rect)
 
     def build_tower(self, tower: Tower):
-        print(f"building tower at {self.index}")
         self.sprite = tower.main_sprite
         self.state = CellState.TOWER
 
@@ -81,8 +80,10 @@ class Grid:
     def get_cell_at(self, pos: tuple[int, int]) -> tuple[int, int]:
         x, y = pos
 
-        col = round((x / constants.SCREEN_SIZE[0]) * self.NUM_COLS)
-        row = round((y / constants.SCREEN_SIZE[1]) * self.NUM_ROWS)
+        col = round(((x - self.cell_size / 2) /
+                    constants.SCREEN_SIZE[0]) * self.NUM_COLS)
+        row = round(((y - self.cell_size / 2) /
+                    constants.SCREEN_SIZE[1]) * self.NUM_ROWS)
 
         return (row, col)
 
