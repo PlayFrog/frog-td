@@ -12,7 +12,6 @@ class UI:
         self.fonts = fonts
         self.show_instructions = False
         self.warning = None
-        self.display_instructions_sign()
 
     def display_information_panel(self, state: GameState, available_coins: int, rounds_complete: int):
         info_panel_surf = pg.Surface(
@@ -63,12 +62,13 @@ class UI:
         padding = 4
 
         name = self.fonts[1].render(
-            f"Torre selecionada: {tower.name}", False, constants.WHITE)
+            tower.name, False, constants.WHITE)
         tower_info_surf.blit(name, (constants.SCREEN_SIZE[0] // 2 - name.get_width(
         ) // 2, padding))
 
         data = self.fonts[0].render(
-            f"Preço: {tower.price}   Dano: {tower.damage}", False, constants.ENEMY_PATH_COLOR)
+            f"Preço: {tower.price}   Dano: {tower.damage}   Área: {tower.range}",
+            False, constants.ENEMY_PATH_COLOR)
         tower_info_surf.blit(data, (constants.SCREEN_SIZE[0] // 2 - data.get_width(
         ) // 2,  name.get_height() + padding * 2))
 

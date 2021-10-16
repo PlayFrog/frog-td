@@ -47,10 +47,12 @@ class Game:
 
     def initialize_tower_images(self) -> list[Tower]:
         towers = []
-        towers.append(Tower("Sapin", 0, (self.grid.cell_size -
-                      4, self.grid.cell_size - 4), 200, 20))
-        towers.append(Tower("Monstrão", 1, (self.grid.cell_size -
-                      4, self.grid.cell_size - 4), 400, 45))
+        towers.append(Tower("Mini-Toad", "mini-toad", (self.grid.cell_size -
+                      4, self.grid.cell_size - 4), 100, 5, 50))
+        towers.append(Tower("Toad", "toad", (self.grid.cell_size -
+                      4, self.grid.cell_size - 4), 200, 15, 50))
+        towers.append(Tower("Monster Toad", "monster-toad", (self.grid.cell_size -
+                      4, self.grid.cell_size - 4), 400, 45, 75))
 
         return towers
 
@@ -59,15 +61,13 @@ class Game:
 
     def close_instructions(self):
         self._ui.show_instructions = False
-        self.grid.update(self.screen)
 
     def update(self):
         self.grid.update(self.screen)
 
         if self.state == GameState.BUILDING_TOWER:
-            row, col = self.grid.get_cell_at(pg.mouse.get_pos())
-            self.grid.show_tower(
-                self.screen, self.towers[self.selected_tower], row, col)
+            twr = self.towers[self.selected_tower]
+            self.grid.show_tower(self.screen, twr, pg.mouse.get_pos())
 
         self._ui.update(self.state, self.available_coins,
                         self.rounds_complete, self.towers[self.selected_tower])

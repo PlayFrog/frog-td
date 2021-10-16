@@ -26,5 +26,5 @@ class CellState(Enum):
     OBSTACLE = 'obstacle'
 
     @staticmethod
-    def default_cell_state() -> Literal:
+    def default() -> Literal:
         return CellState.CONSTRUCTABLE_PATH

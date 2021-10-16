@@ -7,7 +7,7 @@ from tower import Tower
 
 class Cell:
     def __init__(self, size: int, index: tuple[int, int], initial_state=None):
-        self.state = initial_state if initial_state is not None else CellState.default_cell_state()
+        self.state = initial_state if initial_state is not None else CellState.default()
         self.size = size
         self.index = index
         self.sprite = None
@@ -81,38 +81,42 @@ class Grid:
             return False
         return self.grid[row][col].state == CellState.CONSTRUCTABLE_PATH
 
-    def show_tower(self, surf: pg.Surface, tower: Tower, row: int, col: int):
+    def show_tower(self, surf: pg.Surface, tower: Tower, pos: tuple[int, int]):
+        row, col = self.get_cell_at(pos)
         if row is None and col is None:
             return
-        x, y = col * self.cell_size, row * self.cell_size
 
         if self.is_cell_available_to_build(row, col):
             sprite = tower.main_sprite
+            highlight_color = constants.GREEN
         else:
             sprite = tower.invalid_sprite
+            highlight_color = constants.RED
 
-        surf.blit(sprite, (x, y))
+        self.highlight_cell(surf, highlight_color, row, col)
+
+        x, y = pos
+        surf.blit(sprite, (x - sprite.get_width() //
+                           2, y - sprite.get_height() // 2))
 
     def build_tower(self, row: int, col: int, tower: Tower):
         if row is None and col is None:
             return
         self.grid[row][col].build_tower(tower)
 
-    def highlight_cell(self, surf: pg.Surface, pos: tuple[int, int]):
+    def highlight_cell(self, surf: pg.Surface, color: tuple[int, int, int], row: int, col: int):
         # Highlights the cell at position
-        row, col = self.get_cell_at(pos)
         x, y = col * self.cell_size, row * self.cell_size
 
-        highlight_thickness = 4
-        highlight_color = (244, 234, 122)
+        highlight_thickness = 2
 
         for offset in [0, self.cell_size - highlight_thickness]:
             # Horizontal highlight
             highlight_rect = pg.Rect(
                 x, y + offset, self.cell_size, highlight_thickness)
-            pg.draw.rect(surf, highlight_color, highlight_rect)
+            pg.draw.rect(surf, color, highlight_rect)
 
             # Vertical highlight
             highlight_rect = pg.Rect(
                 x + offset, y, highlight_thickness, self.cell_size)
-            pg.draw.rect(surf, highlight_color, highlight_rect)
+            pg.draw.rect(surf, color, highlight_rect)
