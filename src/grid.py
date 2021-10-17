@@ -29,6 +29,29 @@ class Cell:
         elif self.state == CellState.ENEMY:
             raise NotImplementedError()
 
+    def highlight(self, surf: pg.Surface, color: tuple[int, int, int]):
+        # Highlights the cell at position
+        row, col = self.index
+        x, y = col * self.size, row * self.size
+
+        highlight_thickness = 2
+
+        for offset in [0, self.size - highlight_thickness]:
+            # Horizontal highlight
+            highlight_rect = pg.Rect(
+                x, y + offset, self.size, highlight_thickness)
+            pg.draw.rect(surf, color, highlight_rect)
+
+            # Vertical highlight
+            highlight_rect = pg.Rect(
+                x + offset, y, highlight_thickness, self.size)
+            pg.draw.rect(surf, color, highlight_rect)
+
+    def show_radius(self, surf: pg.Surface, radius: int):
+        row, col = self.index
+        x, y = self.size * (col + 0.5), self.size * (row + 0.5)
+        pg.draw.circle(surf, constants.YELLOW, (x, y), radius, width=1)
+
     def build_tower(self, tower: Tower):
         self.sprite = tower.main_sprite
         self.state = CellState.TOWER
@@ -93,7 +116,8 @@ class Grid:
             sprite = tower.invalid_sprite
             highlight_color = constants.RED
 
-        self.highlight_cell(surf, highlight_color, row, col)
+        self.grid[row][col].highlight(surf, highlight_color)
+        self.grid[row][col].show_radius(surf, tower.range)
 
         x, y = pos
         surf.blit(sprite, (x - sprite.get_width() //
@@ -103,20 +127,3 @@ class Grid:
         if row is None and col is None:
             return
         self.grid[row][col].build_tower(tower)
-
-    def highlight_cell(self, surf: pg.Surface, color: tuple[int, int, int], row: int, col: int):
-        # Highlights the cell at position
-        x, y = col * self.cell_size, row * self.cell_size
-
-        highlight_thickness = 2
-
-        for offset in [0, self.cell_size - highlight_thickness]:
-            # Horizontal highlight
-            highlight_rect = pg.Rect(
-                x, y + offset, self.cell_size, highlight_thickness)
-            pg.draw.rect(surf, color, highlight_rect)
-
-            # Vertical highlight
-            highlight_rect = pg.Rect(
-                x + offset, y, highlight_thickness, self.cell_size)
-            pg.draw.rect(surf, color, highlight_rect)

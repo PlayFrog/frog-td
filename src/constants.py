@@ -1,3 +1,5 @@
+import pygame as pg
+
 # Screen and game settings
 SCREEN_SIZE = (800, 600)
 FPS = 30
@@ -9,15 +11,15 @@ INFO_PANEL_HEIGHT = 64
 INSTRUCTIONS_SIGN_HEIGHT = 64
 
 # Colors
-CONSTRUCTABLE_PATH_COLOR = (130, 76, 48)
-ENEMY_PATH_COLOR = (201, 154, 118)
-BACKGROUND_COLOR = (27, 114, 5)
-COIN_COLOR = (234, 186, 28)
-GREEN = (0, 255, 0)
-YELLOW = (244, 234, 122)
-WHITE = (255, 255, 255)
-GRAY = (90, 90, 90)
-RED = (255, 0, 0)
+CONSTRUCTABLE_PATH_COLOR = pg.Color(130, 76, 48)
+ENEMY_PATH_COLOR = pg.Color(201, 154, 118)
+BACKGROUND_COLOR = pg.Color(27, 114, 5)
+COIN_COLOR = pg.Color(234, 186, 28)
+GREEN = pg.Color(0, 255, 0)
+YELLOW = pg.Color(244, 234, 122)
+WHITE = pg.Color(255, 255, 255)
+GRAY = pg.Color(90, 90, 90)
+RED = pg.Color(255, 0, 0)
 
 INSTRUCTIONS = [
     "No modo de Standby...",
