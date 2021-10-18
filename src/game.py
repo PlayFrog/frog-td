@@ -1,7 +1,9 @@
 import pygame as pg
 
 import constants
+from enemy import Enemy
 from grid import Grid
+from rounds import Round
 from state import GameState
 from tower import Tower
 from ui import UI
@@ -35,26 +37,19 @@ class Game:
         self.grid = Grid()
         self._ui = UI(self.screen, self.fonts)
         self.state = GameState.SETUP_PHASE
-        self.rounds_complete = 0
 
         self.available_coins = starting_coins
 
         print("[Initializing] Loading tower images...")
-        self.towers = self.initialize_tower_images()
+        self.towers = Tower.create_towers(self.grid.cell_size)
         self.selected_tower = 0
 
+        print("[Initializing] Setting up rounds...")
+        self.enemies = Enemy.create_enemies(self.grid.cell_size)
+        self.rounds = Round.create_rounds(self.enemies)
+        self.rounds_complete = 0
+
         print("[Running] Game starting")
-
-    def initialize_tower_images(self) -> list[Tower]:
-        towers = []
-        towers.append(Tower("Mini-Toad", "mini-toad", (self.grid.cell_size -
-                      4, self.grid.cell_size - 4), 100, 5, 50))
-        towers.append(Tower("Toad", "toad", (self.grid.cell_size -
-                      4, self.grid.cell_size - 4), 200, 15, 50))
-        towers.append(Tower("Monster Toad", "monster-toad", (self.grid.cell_size -
-                      4, self.grid.cell_size - 4), 400, 45, 75))
-
-        return towers
 
     def toggle_instructions(self):
         self._ui.show_instructions = not self._ui.show_instructions
@@ -68,6 +63,9 @@ class Game:
         if self.state == GameState.BUILDING_TOWER:
             twr = self.towers[self.selected_tower]
             self.grid.show_tower(self.screen, twr, pg.mouse.get_pos())
+
+        elif self.state == GameState.RUNNING_ROUND:
+            self.rounds[self.rounds_complete].update(self.grid)
 
         self._ui.update(self.state, self.available_coins,
                         self.rounds_complete, self.towers[self.selected_tower])

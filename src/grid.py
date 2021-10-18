@@ -1,6 +1,8 @@
 import pygame as pg
 
 import constants
+from enemy import Enemy
+from linked_list import Node
 from state import CellState
 from tower import Tower
 
@@ -18,16 +20,16 @@ class Cell:
         color = constants.CONSTRUCTABLE_PATH_COLOR
         if self.state == CellState.OBSTACLE:
             color = constants.BACKGROUND_COLOR
-        elif self.state == CellState.ENEMY_PATH:
+        elif self.state == CellState.ENEMY_PATH or self.state == CellState.ENEMY:
             color = constants.ENEMY_PATH_COLOR
 
         rect = pg.Rect(pos, (self.size, self.size))
         pg.draw.rect(surf, color, rect)
 
-        if self.state == CellState.TOWER:
-            surf.blit(self.unit.main_sprite, pos)
-        elif self.state == CellState.ENEMY:
-            raise NotImplementedError()
+        if self.state == CellState.TOWER or self.state == CellState.ENEMY:
+            unit_pos = pos[0] + self.unit.padding // 2, pos[1] + \
+                self.unit.padding // 2
+            surf.blit(self.unit.main_sprite, unit_pos)
 
     def highlight(self, surf: pg.Surface, color: tuple[int, int, int]):
         # Highlights the cell at position
@@ -49,7 +51,7 @@ class Cell:
 
     def show_radius(self, surf: pg.Surface, radius: int = None):
         if not radius:
-            if not self.unit:
+            if self.state != CellState.TOWER:
                 return
             radius = self.unit.range
         row, col = self.index
@@ -65,6 +67,19 @@ class Cell:
         self.unit = tower
         self.state = CellState.TOWER
 
+    def push_enemy(self, enemy: Enemy):
+        if self.state == CellState.ENEMY:
+            existing_enemy = self.unit
+        else:
+            self.state = CellState.ENEMY
+            existing_enemy = None
+
+        if enemy is None:
+            self.state = CellState.ENEMY_PATH
+        else:
+            self.unit = enemy
+        return existing_enemy
+
 
 class Grid:
     NUM_ROWS = 15
@@ -75,6 +90,8 @@ class Grid:
             raise ValueError("Cells must be squared")
 
         grid: list[list[Cell]] = []
+        enemy_path_head: Node = None
+        enemy_path_tail: Node = None
 
         self.cell_size = constants.SCREEN_SIZE[0] // self.NUM_COLS
 
@@ -83,12 +100,20 @@ class Grid:
             for j in range(self.NUM_COLS):
                 # TODO: Create a better enemy path
                 if j == self.NUM_COLS // 2:
-                    row.append(Cell(self.cell_size, (i, j),
-                               initial_state=CellState.ENEMY_PATH))
+                    cell = Cell(self.cell_size, (i, j),
+                                initial_state=CellState.ENEMY_PATH)
+                    row.append(cell)
+                    node = Node(cell)
+                    if not enemy_path_head:
+                        enemy_path_head = node
+                    else:
+                        enemy_path_tail.next = node
+                    enemy_path_tail = node
                 else:
                     row.append(Cell(self.cell_size, (i, j)))
             grid.append(row)
 
+        self.enemy_path = enemy_path_head
         self.grid = grid
         self.show_radius = False
 
@@ -143,3 +168,10 @@ class Grid:
         if row is None and col is None:
             return
         self.grid[row][col].build_tower(tower)
+
+    def push_enemies(self, new_enemy: Enemy = None):
+        cursor = self.enemy_path
+        enemy = new_enemy
+        while cursor is not None:
+            enemy = cursor.item.push_enemy(enemy)
+            cursor = cursor.next
