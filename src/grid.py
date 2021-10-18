@@ -10,7 +10,7 @@ class Cell:
         self.state = initial_state if initial_state is not None else CellState.default()
         self.size = size
         self.index = index
-        self.sprite = None
+        self.unit = None
 
     def display(self, surf: pg.Surface):
         pos = (self.index[1] * self.size, self.index[0] * self.size)
@@ -25,7 +25,7 @@ class Cell:
         pg.draw.rect(surf, color, rect)
 
         if self.state == CellState.TOWER:
-            surf.blit(self.sprite, pos)
+            surf.blit(self.unit.main_sprite, pos)
         elif self.state == CellState.ENEMY:
             raise NotImplementedError()
 
@@ -47,13 +47,22 @@ class Cell:
                 x + offset, y, highlight_thickness, self.size)
             pg.draw.rect(surf, color, highlight_rect)
 
-    def show_radius(self, surf: pg.Surface, radius: int):
+    def show_radius(self, surf: pg.Surface, radius: int = None):
+        if not radius:
+            if not self.unit:
+                return
+            radius = self.unit.range
         row, col = self.index
-        x, y = self.size * (col + 0.5), self.size * (row + 0.5)
-        pg.draw.circle(surf, constants.YELLOW, (x, y), radius, width=1)
+        rgba_surf = pg.Surface((radius * 2, radius * 2),  pg.SRCALPHA)
+        pg.draw.circle(rgba_surf, constants.YELLOW_TRANSLUCID,
+                       (radius, radius), radius)
+        x, y = self.size * col - \
+            (radius - self.size // 2), self.size * \
+            row - (radius - self.size // 2)
+        surf.blit(rgba_surf, (x, y))
 
     def build_tower(self, tower: Tower):
-        self.sprite = tower.main_sprite
+        self.unit = tower
         self.state = CellState.TOWER
 
 
@@ -81,11 +90,18 @@ class Grid:
             grid.append(row)
 
         self.grid = grid
+        self.show_radius = False
 
-    def update(self, surf: pg.Surface):
+    def pre_update(self, surf: pg.Surface):
         for row in self.grid:
             for cell in row:
                 cell.display(surf)
+
+    def post_update(self, surf: pg.Surface):
+        for row in self.grid:
+            for cell in row:
+                if self.show_radius:
+                    cell.show_radius(surf)
 
     def get_cell_at(self, pos: tuple[int, int]) -> tuple[int, int]:
         x, y = pos

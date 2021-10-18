@@ -17,6 +17,7 @@ BACKGROUND_COLOR = pg.Color(27, 114, 5)
 COIN_COLOR = pg.Color(234, 186, 28)
 GREEN = pg.Color(0, 255, 0)
 YELLOW = pg.Color(244, 234, 122)
+YELLOW_TRANSLUCID = pg.Color(244, 234, 122, 122)
 WHITE = pg.Color(255, 255, 255)
 GRAY = pg.Color(90, 90, 90)
 RED = pg.Color(255, 0, 0)
@@ -24,6 +25,7 @@ RED = pg.Color(255, 0, 0)
 INSTRUCTIONS = [
     "No modo de Standby...",
     "Pressione 'b' para construir uma torre.",
+    "Pressione 'r' para mostrar a área de ataque das torres.",
     "Pressione 'espaço' para começar um round.",
     "",
     "No modo de Construção...",

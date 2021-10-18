@@ -63,7 +63,7 @@ class Game:
         self._ui.show_instructions = False
 
     def update(self):
-        self.grid.update(self.screen)
+        self.grid.pre_update(self.screen)
 
         if self.state == GameState.BUILDING_TOWER:
             twr = self.towers[self.selected_tower]
@@ -72,6 +72,7 @@ class Game:
         self._ui.update(self.state, self.available_coins,
                         self.rounds_complete, self.towers[self.selected_tower])
 
+        self.grid.post_update(self.screen)
         self.fps_clock.tick(constants.FPS)
         pg.display.update()
 
@@ -109,3 +110,6 @@ class Game:
 
     def start_round(self):
         self.state = GameState.RUNNING_ROUND
+
+    def show_tower_radius(self):
+        self.grid.show_radius = not self.grid.show_radius

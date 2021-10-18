@@ -22,6 +22,8 @@ def main():
                     game.toggle_instructions()
                 else:
                     game.close_instructions()
+                    if event.key == pg.K_r:
+                        game.show_tower_radius()
             elif event.type == pg.MOUSEBUTTONDOWN:
                 game.close_instructions()
 
