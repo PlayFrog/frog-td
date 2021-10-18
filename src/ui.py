@@ -13,7 +13,8 @@ class UI:
         self.show_instructions = False
         self.warning = None
 
-    def display_information_panel(self, state: GameState, available_coins: int, rounds_complete: int):
+    def display_information_panel(self, state: GameState, available_coins: int,
+                                  rounds_complete: int):
         info_panel_surf = pg.Surface(
             (constants.SCREEN_SIZE[0], constants.INFO_PANEL_HEIGHT))
         padding = 4
@@ -90,7 +91,8 @@ class UI:
             instruction_txt = self.fonts[0].render(
                 txt, False, constants.WHITE)
             instructions_modal.blit(
-                instruction_txt, (padding_x, title.get_height() + padding_y * (i + 2) + instruction_txt.get_height() * (i + 1)))
+                instruction_txt, (padding_x, title.get_height() + padding_y * (i + 2) +
+                                  instruction_txt.get_height() * (i + 1)))
 
         self.screen.blit(instructions_modal,
                          (constants.SCREEN_SIZE[0] // 2 - constants.INSTRUCTIONS_MODAL_SIZE[0] // 2,
@@ -100,7 +102,8 @@ class UI:
     def set_warning(self, message: str):
         self.warning = message
 
-    def update(self, state: GameState, available_coins: int, rounds_complete: int, selected_tower: Tower):
+    def update(self, state: GameState, available_coins: int, rounds_complete: int,
+               selected_tower: Tower):
         self.display_information_panel(state, available_coins, rounds_complete)
         if self.show_instructions:
             self.display_instructions_modal()
