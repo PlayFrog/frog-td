@@ -85,7 +85,7 @@ class Grid:
     NUM_ROWS = 15
     NUM_COLS = 20
 
-    def __init__(self):
+    def __init__(self, level_name: str):
         if constants.SCREEN_SIZE[1] // self.NUM_ROWS != constants.SCREEN_SIZE[0] // self.NUM_COLS:
             raise ValueError("Cells must be squared")
 
@@ -94,23 +94,13 @@ class Grid:
         enemy_path_tail: Node = None
 
         self.cell_size = constants.SCREEN_SIZE[0] // self.NUM_COLS
+        state_grid = self.load_from_file(level_name)
 
         for i in range(self.NUM_ROWS):
             row = []
             for j in range(self.NUM_COLS):
-                # TODO: Create a better enemy path
-                if j == self.NUM_COLS // 2:
-                    cell = Cell(self.cell_size, (i, j),
-                                initial_state=CellState.ENEMY_PATH)
-                    row.append(cell)
-                    node = Node(cell)
-                    if not enemy_path_head:
-                        enemy_path_head = node
-                    else:
-                        enemy_path_tail.next = node
-                    enemy_path_tail = node
-                else:
-                    row.append(Cell(self.cell_size, (i, j)))
+                cell = Cell(self.cell_size, (i, j), initial_state=state_grid[i][j]) 
+                row.append(cell)
             grid.append(row)
 
         self.enemy_path = enemy_path_head
@@ -175,3 +165,19 @@ class Grid:
         while cursor is not None:
             enemy = cursor.item.push_enemy(enemy)
             cursor = cursor.next
+
+    def load_from_file(self, level_name: str):
+        grid: list[list[CellState]] = [[None for x in range(self.NUM_COLS)] for y in range(self.NUM_ROWS)]
+        
+        file = open(f'assets/levels/{level_name}.txt')
+        rows, cols = file.readline().split(" ")
+        rows, cols = int(rows), int(cols)
+
+        for i in range(rows):
+            line = file.readline().strip()
+            assert(len(line) == cols)
+            for j, ch in enumerate(line):
+                grid[i][j] = CellState.from_char(ch)
+        return grid
+
+        

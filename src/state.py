@@ -28,3 +28,12 @@ class CellState(Enum):
     @staticmethod
     def default() -> Literal:
         return CellState.CONSTRUCTABLE_PATH
+
+    @staticmethod
+    def from_char(c : str) -> Literal:
+        if c == '#':
+            return CellState.CONSTRUCTABLE_PATH
+        elif c == '1':
+            return CellState.ENEMY_PATH
+        else:
+            raise NotImplementedError(f'no CellState corresponds to {c}')
