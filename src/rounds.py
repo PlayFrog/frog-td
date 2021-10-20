@@ -16,9 +16,10 @@ class Round:
         i = 0
         rounds: list[Round] = []
         for round_index in range(constants.NUM_ROUNDS):
-            enemy = Enemy(enemies[i].hp, enemies[i].speed,
+            enemy = Enemy(enemies[i].hp, enemies[i].speed, enemies[i].reward,
                           sprite=enemies[i].main_sprite, padding=enemies[i].padding)
             enemy.hp += round_index * 100
+            enemy.reward += round_index * 10
             enemy.set_speed(enemy.speed + round(round_index * 0.3))
 
             quantity = 5 + round_index * 1
