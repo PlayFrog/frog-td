@@ -32,7 +32,7 @@ class CellState(Enum):
         return CellState.CONSTRUCTABLE_PATH
 
     @staticmethod
-    def from_char(c : str) -> Literal:
+    def from_char(c: str) -> Literal:
         if c == '#':
             return CellState.CONSTRUCTABLE_PATH
         elif c == '1':

@@ -94,12 +94,12 @@ class Grid:
             raise ValueError("Cells must be squared")
 
         grid: list[list[Cell]] = []
-        
-        x_start : int = -1
-        x_end   : int = -1
 
-        y_start : int = -1
-        y_end   : int = -1
+        x_start: int = -1
+        x_end: int = -1
+
+        y_start: int = -1
+        y_end: int = -1
 
         self.cell_size = constants.SCREEN_SIZE[0] // self.NUM_COLS
         state_grid = self.load_from_file(level_name)
@@ -107,9 +107,10 @@ class Grid:
         for i in range(self.NUM_ROWS):
             row = []
             for j in range(self.NUM_COLS):
-                cell = Cell(self.cell_size, (i, j), initial_state=state_grid[i][j])
+                cell = Cell(self.cell_size, (i, j),
+                            initial_state=state_grid[i][j])
                 if state_grid[i][j] == CellState.PATH_START:
-                    self.enemy_path : Node = Node(cell)
+                    self.enemy_path: Node = Node(cell)
                     x_start, y_start = i, j
                 elif (state_grid[i][j] == CellState.PATH_END):
                     x_end, y_end = i, j
@@ -118,8 +119,8 @@ class Grid:
         assert(x_start != -1 and x_end != -1 and y_start != -1, y_end != -1)
         self.grid = grid
         self.show_radius = False
-        self.create_enemy_path(x_start, y_start, x_end, y_end, self.enemy_path, None)
-        
+        self.create_enemy_path(x_start, y_start, x_end,
+                               y_end, self.enemy_path, None)
 
     def pre_update(self, surf: pg.Surface):
         for row in self.grid:
@@ -182,17 +183,17 @@ class Grid:
 
     def create_enemy_path(self, x_start: int, y_start: int, x_end: int, y_end: int, result: Node, from_cell: Cell = None):
         def check_indices(i, j) -> bool:
-            return i >= 0 and i < self.NUM_ROWS and j < self.NUM_COLS and j>=0
+            return i >= 0 and i < self.NUM_ROWS and j < self.NUM_COLS and j >= 0
 
         def find_next_cell(i, j, from_cell) -> Cell:
             if check_indices(i-1, j) and from_cell.index != self.grid[i-1][j].index and self.grid[i-1][j].state == CellState.ENEMY_PATH or self.grid[i-1][j].state == CellState.PATH_END:
-                return self.grid[i-1][j] # path on top
+                return self.grid[i-1][j]  # path on top
             if check_indices(i+1, j) and from_cell.index != self.grid[i+1][j].index and self.grid[i+1][j].state == CellState.ENEMY_PATH or self.grid[i+1][j].state == CellState.PATH_END:
-                return self.grid[i+1][j] # path on bottom
-            if check_indices(i, j-1) and from_cell.index != self.grid[i][j-1].index and self.grid[i][j-1].state == CellState.ENEMY_PATH or  self.grid[i][j-1].state == CellState.PATH_END:
-                return self.grid[i][j-1] # path on left 
+                return self.grid[i+1][j]  # path on bottom
+            if check_indices(i, j-1) and from_cell.index != self.grid[i][j-1].index and self.grid[i][j-1].state == CellState.ENEMY_PATH or self.grid[i][j-1].state == CellState.PATH_END:
+                return self.grid[i][j-1]  # path on left
             if check_indices(i, j+1) and from_cell.index != self.grid[i][j+1].index and self.grid[i][j+1].state == CellState.ENEMY_PATH or self.grid[i][j+1].state == CellState.PATH_END:
-                return self.grid[i][j+1] # path on right
+                return self.grid[i][j+1]  # path on right
             else:
                 return None
         if x_start == x_end and y_start == y_end:
@@ -202,12 +203,13 @@ class Grid:
                 from_cell = result.item
             result.next = Node(find_next_cell(x_start, y_start, from_cell))
             x, y = result.next.item.index
-            self.create_enemy_path(x, y, x_end, y_end, result.next, result.item)
-            
+            self.create_enemy_path(
+                x, y, x_end, y_end, result.next, result.item)
 
     def load_from_file(self, level_name: str):
-        grid: list[list[CellState]] = [[None for x in range(self.NUM_COLS)] for y in range(self.NUM_ROWS)]
-        
+        grid: list[list[CellState]] = [
+            [None for x in range(self.NUM_COLS)] for y in range(self.NUM_ROWS)]
+
         file = open(f'assets/levels/{level_name}.txt')
         rows, cols = file.readline().split(" ")
         rows, cols = int(rows), int(cols)
@@ -218,5 +220,3 @@ class Grid:
             for j, ch in enumerate(line):
                 grid[i][j] = CellState.from_char(ch)
         return grid
-
-        
