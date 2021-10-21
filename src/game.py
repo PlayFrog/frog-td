@@ -10,7 +10,7 @@ from ui import UI
 
 
 class Game:
-    def __init__(self, game_name: str, starting_coins=200):
+    def __init__(self, game_name: str, starting_coins: int = 200):
         print("[Initializing] Starting Pygame...")
         pg.init()
 
