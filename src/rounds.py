@@ -1,3 +1,4 @@
+from typing import Sequence
 import pygame as pg
 
 import constants
@@ -12,7 +13,7 @@ class Round:
         self.last_update = pg.time.get_ticks()
 
     @staticmethod
-    def create_rounds(enemies):
+    def create_rounds(enemies: Sequence[Enemy]):
         i = 0
         rounds: list[Round] = []
         for round_index in range(constants.NUM_ROUNDS):

@@ -1,13 +1,12 @@
+from typing import Optional
 import pygame as pg
+from constants import SCREEN_SIZE
 
 
 class Enemy:
-    def __init__(self, hit_points: int, speed: int, reward: int, filename: str = None,
-                 display_size: tuple[int, int] = None, sprite: pg.Surface = None, padding: int = 0):
-        if sprite:
-            self.main_sprite = sprite
-        else:
-            self.main_sprite = pg.transform.scale(pg.image.load(
+    def __init__(self, hit_points: int, speed: int, reward: int, filename: Optional[str] = None,
+                 display_size: tuple[int, int] = SCREEN_SIZE, sprite: Optional[pg.surface.Surface] = None, padding: int = 0):
+        self.main_sprite = sprite or pg.transform.scale(pg.image.load(
                 f'assets/enemies/{filename}.png').convert_alpha(), display_size)
         self.padding = padding
         self.hp = hit_points

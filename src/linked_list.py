@@ -1,9 +1,7 @@
-from typing import TypeVar
+from typing import Any, Optional
+from dataclasses import dataclass
 
-T = TypeVar("T")
-
-
+@dataclass
 class Node:
-    def __init__(self, item: T):
-        self.item = item
-        self.next = None
+    item: Any
+    next: Optional['Node'] = None

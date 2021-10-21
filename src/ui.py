@@ -1,3 +1,4 @@
+from typing import Optional
 import pygame as pg
 
 import constants
@@ -6,7 +7,7 @@ from tower import Tower
 
 
 class UI:
-    def __init__(self, screen: pg.Surface, fonts: list[pg.font.Font]):
+    def __init__(self, screen: pg.surface.Surface, fonts: list[pg.font.Font]):
         self.screen = screen
         self.screen.fill('black')
         self.fonts = fonts
@@ -99,7 +100,7 @@ class UI:
                           constants.SCREEN_SIZE[1] // 2 - constants.INSTRUCTIONS_MODAL_SIZE[1] // 2)
                          )
 
-    def set_warning(self, message: str):
+    def set_warning(self, message: Optional[str]):
         self.warning = message
 
     def update(self, state: GameState, available_coins: int, rounds_complete: int,
