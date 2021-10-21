@@ -34,7 +34,7 @@ class Game:
         pg.display.set_caption(game_name)
 
         # Start game logic
-        self.grid = Grid()
+        self.grid = Grid("level1")
         self._ui = UI(self.screen, self.fonts)
         self.state = GameState.SETUP_PHASE
 

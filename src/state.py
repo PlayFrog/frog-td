@@ -24,6 +24,8 @@ class CellState(Enum):
     CONSTRUCTABLE_PATH = 'constructable_path'
     ENEMY_PATH = 'enemy_path'
     OBSTACLE = 'obstacle'
+    PATH_START = 'path_start'
+    PATH_END = 'path_end'
 
     @staticmethod
     def default() -> Literal:
@@ -35,5 +37,9 @@ class CellState(Enum):
             return CellState.CONSTRUCTABLE_PATH
         elif c == '1':
             return CellState.ENEMY_PATH
+        elif c == '*':
+            return CellState.PATH_END
+        elif c == '$':
+            return CellState.PATH_START
         else:
             raise NotImplementedError(f'no CellState corresponds to {c}')
