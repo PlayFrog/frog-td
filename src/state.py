@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Literal
 
 
 class GameState(Enum):
@@ -27,11 +28,11 @@ class CellState(Enum):
     PATH_END = 'path_end'
 
     @staticmethod
-    def default() -> 'CellState':
+    def default() -> Literal:
         return CellState.CONSTRUCTABLE_PATH
 
     @staticmethod
-    def from_char(c: str) -> 'CellState':
+    def from_char(c: str) -> Literal:
         if c == '#':
             return CellState.CONSTRUCTABLE_PATH
         elif c == '1':

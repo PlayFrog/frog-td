@@ -15,7 +15,7 @@ class Tower:
         self.padding = padding
 
     @staticmethod
-    def create_towers(cell_size: int):
+    def create_towers(cell_size=int):
         paddings = [8, 4, 1]
         mini_toad = Tower("Mini-Toad", "mini-toad",
                           (cell_size - paddings[0], cell_size - paddings[0]), 100, 5, 50, padding=paddings[0])
