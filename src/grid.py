@@ -71,6 +71,9 @@ class Cell:
         self.unit = tower
         self.state = CellState.TOWER
 
+    def get_position(self):
+        return (self.index[0] * self.size, self.index[1] * self.size)
+
     def push_enemy(self, enemy: Enemy):
         if self.state == CellState.ENEMY:
             existing_enemy = self.unit
@@ -81,6 +84,8 @@ class Cell:
         if enemy is None:
             self.state = CellState.ENEMY_PATH
         else:
+            enemy.index = self.index
+            enemy.position = (self.get_position())
             self.unit = enemy
         return existing_enemy
 
@@ -116,7 +121,6 @@ class Grid:
                     x_end, y_end = i, j
                 row.append(cell)
             grid.append(row)
-        assert(x_start != -1 and x_end != -1 and y_start != -1, y_end != -1)
         self.grid = grid
         self.show_radius = False
         self.create_enemy_path(x_start, y_start, x_end,
@@ -180,6 +184,9 @@ class Grid:
         while cursor is not None:
             enemy = cursor.item.push_enemy(enemy)
             cursor = cursor.next
+
+    def kill_enemy(self, row: int, col: int):
+        self.grid[row][col].state = CellState.ENEMY_PATH
 
     def create_enemy_path(self, x_start: int, y_start: int, x_end: int, y_end: int, result: Node, from_cell: Cell = None):
         def check_indices(i, j) -> bool:

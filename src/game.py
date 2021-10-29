@@ -41,13 +41,14 @@ class Game:
         self.available_coins = starting_coins
 
         print("[Initializing] Loading tower images...")
-        self.towers = Tower.create_towers(self.grid.cell_size)
+        self.tower_options = Tower.create_towers(self.grid.cell_size)
         self.selected_tower = 0
 
         print("[Initializing] Setting up rounds...")
         self.enemies = Enemy.create_enemies(self.grid.cell_size)
         self.rounds = Round.create_rounds(self.enemies)
         self.rounds_complete = 0
+        self.existing_towers: list[Tower] = []
 
         print("[Running] Game starting")
 
@@ -61,14 +62,15 @@ class Game:
         self.grid.pre_update(self.screen)
 
         if self.state == GameState.BUILDING_TOWER:
-            twr = self.towers[self.selected_tower]
+            twr = self.tower_options[self.selected_tower]
             self.grid.show_tower(self.screen, twr, pg.mouse.get_pos())
 
         elif self.state == GameState.RUNNING_ROUND:
-            self.rounds[self.rounds_complete].update(self.grid)
+            self.rounds[self.rounds_complete].update(
+                self.grid, self.existing_towers, self.screen)
 
         self._ui.update(self.state, self.available_coins,
-                        self.rounds_complete, self.towers[self.selected_tower])
+                        self.rounds_complete, self.tower_options[self.selected_tower])
 
         self.grid.post_update(self.screen)
         self.fps_clock.tick(constants.FPS)
@@ -79,14 +81,14 @@ class Game:
 
     def increase_selected_tower(self):
         self.selected_tower = (
-            self.selected_tower + 1) % len(self.towers)
+            self.selected_tower + 1) % len(self.tower_options)
 
     def decrease_selected_tower(self):
         self.selected_tower = (
-            self.selected_tower - 1) % len(self.towers)
+            self.selected_tower - 1) % len(self.tower_options)
 
     def try_build_tower(self):
-        tower = self.towers[self.selected_tower]
+        tower = self.tower_options[self.selected_tower]
         row, col = self.grid.get_cell_at(pg.mouse.get_pos())
 
         if not self.grid.is_cell_available_to_build(row, col):
@@ -99,6 +101,8 @@ class Game:
 
         self._ui.set_warning(None)
         self.available_coins -= tower.price
+        tower.position = (row * self.grid.cell_size, col * self.grid.cell_size)
+        self.existing_towers.append(tower)
         self.grid.build_tower(row, col, tower)
         self.state = GameState.SETUP_PHASE
 

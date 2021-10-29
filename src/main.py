@@ -32,7 +32,10 @@ def main():
                     if event.key == pg.K_b:
                         game.start_building_tower()
                     elif event.key == pg.K_SPACE:
-                        game.start_round()
+                        if len(game.existing_towers) == 0:
+                            game.start_building_tower()
+                        else:
+                            game.start_round()
 
             elif game.state == GameState.BUILDING_TOWER:
                 if event.type == pg.KEYDOWN:

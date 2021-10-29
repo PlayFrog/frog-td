@@ -68,7 +68,7 @@ class UI:
         ) // 2, padding))
 
         data = self.fonts[0].render(
-            f"Preço: {tower.price}   Dano: {tower.damage}   Área: {tower.range}",
+            f"Preço: {tower.price}   Dano: {tower.damage}   Área: {tower.range}   Velocidade: {tower.speed}",
             False, constants.ENEMY_PATH_COLOR)
         tower_info_surf.blit(data, (constants.SCREEN_SIZE[0] // 2 - data.get_width(
         ) // 2,  name.get_height() + padding * 2))
