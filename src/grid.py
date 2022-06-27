@@ -13,6 +13,8 @@ class Cell:
         self.size = size
         self.index = index
         self.unit = None
+        self.is_starting_path = initial_state == CellState.PATH_START
+        self.is_ending_path = initial_state == CellState.PATH_END
 
     def display(self, surf: pg.Surface):
         pos = (self.index[1] * self.size, self.index[0] * self.size)
@@ -34,6 +36,22 @@ class Cell:
             unit_pos = pos[0] + self.unit.padding // 2, pos[1] + \
                 self.unit.padding // 2
             surf.blit(self.unit.main_sprite, unit_pos)
+
+            # Show HP bar for enemy cell
+            if self.state == CellState.ENEMY:
+                padding = 8
+                red_bar = pg.Rect(
+                    (pos[0] + padding // 2, pos[1] +
+                     self.size - constants.HP_BAR_HEIGHT),
+                    (self.size - padding, constants.HP_BAR_HEIGHT))
+                pg.draw.rect(surf, constants.RED, red_bar)
+
+                life_taken_pct = self.unit.hp / self.unit.max_hp
+                green_bar = pg.Rect(
+                    (pos[0] + padding // 2, pos[1] +
+                     self.size - constants.HP_BAR_HEIGHT),
+                    ((self.size - padding) * life_taken_pct, constants.HP_BAR_HEIGHT))
+                pg.draw.rect(surf, constants.GREEN, green_bar)
 
     def highlight(self, surf: pg.Surface, color: tuple[int, int, int]):
         # Highlights the cell at position
@@ -71,23 +89,31 @@ class Cell:
         self.unit = tower
         self.state = CellState.TOWER
 
-    def get_position(self):
+    def get_center(self):
         return (self.index[0] * self.size, self.index[1] * self.size)
 
     def push_enemy(self, enemy: Enemy):
         if self.state == CellState.ENEMY:
             existing_enemy = self.unit
         else:
-            self.state = CellState.ENEMY
             existing_enemy = None
 
+        passed_enemy = False
         if enemy is None:
-            self.state = CellState.ENEMY_PATH
+            if self.is_starting_path:
+                self.state = CellState.PATH_START
+            elif self.is_ending_path:
+                self.state = CellState.PATH_END
+            else:
+                self.state = CellState.ENEMY_PATH
         else:
+            self.state = CellState.ENEMY
             enemy.index = self.index
-            enemy.position = (self.get_position())
+            enemy.position = (self.get_center())
             self.unit = enemy
-        return existing_enemy
+            if self.is_ending_path:
+                passed_enemy = True
+        return existing_enemy, passed_enemy
 
 
 class Grid:
@@ -132,10 +158,10 @@ class Grid:
                 cell.display(surf)
 
     def post_update(self, surf: pg.Surface):
-        for row in self.grid:
-            for cell in row:
-                if self.show_radius:
-                    cell.show_radius(surf)
+        # Show radius of cell in mouse position
+        if self.show_radius:
+            row, col = self.get_cell_at(pg.mouse.get_pos())
+            self.grid[row][col].show_radius(surf)
 
     def get_cell_at(self, pos: tuple[int, int]) -> tuple[int, int]:
         x, y = pos
@@ -154,17 +180,17 @@ class Grid:
             return False
         return self.grid[row][col].state == CellState.CONSTRUCTABLE_PATH
 
-    def show_tower(self, surf: pg.Surface, tower: Tower, pos: tuple[int, int]):
+    def show_tower(self, surf: pg.Surface, tower: Tower, pos: tuple[int, int], available_coins: int):
         row, col = self.get_cell_at(pos)
         if row is None and col is None:
             return
 
-        if self.is_cell_available_to_build(row, col):
-            sprite = tower.main_sprite
-            highlight_color = constants.GREEN
-        else:
+        if not self.is_cell_available_to_build(row, col) or available_coins < tower.price:
             sprite = tower.invalid_sprite
             highlight_color = constants.RED
+        else:
+            sprite = tower.main_sprite
+            highlight_color = constants.GREEN
 
         self.grid[row][col].highlight(surf, highlight_color)
         self.grid[row][col].show_radius(surf, tower.range)
@@ -178,12 +204,16 @@ class Grid:
             return
         self.grid[row][col].build_tower(tower)
 
-    def push_enemies(self, new_enemy: Enemy = None):
+    def push_enemy(self, new_enemy: Enemy = None) -> bool:
+        # Returns True if an enemy passed
         cursor = self.enemy_path
         enemy = new_enemy
         while cursor is not None:
-            enemy = cursor.item.push_enemy(enemy)
+            enemy, path_ended = cursor.item.push_enemy(enemy)
+            if path_ended:
+                return True
             cursor = cursor.next
+        return False
 
     def kill_enemy(self, row: int, col: int):
         self.grid[row][col].state = CellState.ENEMY_PATH

@@ -8,9 +8,11 @@ from state import GameState
 
 
 def main():
-    game = Game(constants.GAME_NAME, starting_coins=600)
+    game = Game(constants.GAME_NAME, starting_coins=constants.STARTING_COINS)
 
-    while 1:
+    running = True
+
+    while running:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
@@ -48,7 +50,24 @@ def main():
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     game.try_build_tower()
 
+            elif game.state == GameState.WON or game.state == GameState.LOST:
+                running = False
+
         game.update()
+
+    if game.state == GameState.WON:
+        game.win()
+    elif game.state == GameState.LOST:
+        game.game_over()
+    game.fps_clock.tick(constants.FPS)
+
+    while 1:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
+
+        pg.display.update()
 
 
 if __name__ == '__main__':

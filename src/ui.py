@@ -14,7 +14,7 @@ class UI:
         self.warning = None
 
     def display_information_panel(self, state: GameState, available_coins: int,
-                                  rounds_complete: int):
+                                  rounds_complete: int, lifes: int):
         info_panel_surf = pg.Surface(
             (constants.SCREEN_SIZE[0], constants.INFO_PANEL_HEIGHT))
         padding = 4
@@ -24,23 +24,30 @@ class UI:
         info_panel_surf.blit(coin_text, (padding, padding))
 
         game_mode_text = self.fonts[0].render(
-            f'Modo: {state}', False, constants.WHITE)
+            f'Status: {state}', False, constants.WHITE)
         info_panel_surf.blit(
             game_mode_text, (padding, constants.INFO_PANEL_HEIGHT // 2 + padding))
 
         round_text = self.fonts[0].render(
-            f"Rounds completos: {rounds_complete}", False, constants.WHITE)
+            f"Rounds completos: {rounds_complete}/{constants.NUM_ROUNDS}", False, constants.WHITE)
         info_panel_surf.blit(
             round_text, (constants.SCREEN_SIZE[0] -
                          (round_text.get_width() + padding), padding)
+        )
+
+        round_text = self.fonts[0].render(
+            f"Vidas remanescentes: {lifes}", False, constants.WHITE)
+        info_panel_surf.blit(
+            round_text, (constants.SCREEN_SIZE[0] -
+                         (round_text.get_width() + padding), constants.INFO_PANEL_HEIGHT // 2 + padding)
         )
 
         if self.warning:
             warning_text = self.fonts[0].render(
                 self.warning, False, constants.RED)
             info_panel_surf.blit(
-                warning_text, (constants.SCREEN_SIZE[0] - (
-                    warning_text.get_width() + padding), constants.INFO_PANEL_HEIGHT // 2 + padding)
+                warning_text, ((constants.SCREEN_SIZE[0] // 2) - ((
+                    warning_text.get_width() + padding) // 2), constants.INFO_PANEL_HEIGHT // 2 + padding)
             )
 
         self.screen.blit(info_panel_surf, (0, constants.SCREEN_SIZE[1]))
@@ -103,11 +110,38 @@ class UI:
         self.warning = message
 
     def update(self, state: GameState, available_coins: int, rounds_complete: int,
-               selected_tower: Tower):
-        self.display_information_panel(state, available_coins, rounds_complete)
+               selected_tower: Tower, lifes: int):
+        self.display_information_panel(
+            state, available_coins, rounds_complete, lifes)
         if self.show_instructions:
             self.display_instructions_modal()
         if state == GameState.BUILDING_TOWER:
             self.display_tower_info(selected_tower)
         else:
             self.display_instructions_sign()
+
+    def show_game_over(self):
+        game_over_modal = pg.Surface(constants.INSTRUCTIONS_MODAL_SIZE)
+        game_over_modal.fill(constants.BLACK)
+
+        text = self.fonts[1].render("GAME OVER!", False, constants.RED)
+
+        game_over_modal.blit(text,
+                             (constants.INSTRUCTIONS_MODAL_SIZE[0] // 2 - text.get_width() // 2,
+                                 constants.INSTRUCTIONS_MODAL_SIZE[1] // 2 - text.get_height() // 2))
+
+        self.screen.blit(game_over_modal, (constants.SCREEN_SIZE[0] // 2 - constants.INSTRUCTIONS_MODAL_SIZE[0] // 2,
+                                           constants.SCREEN_SIZE[1] // 2 - constants.INSTRUCTIONS_MODAL_SIZE[1] // 2))
+
+    def show_victory(self):
+        victory_modal = pg.Surface(constants.INSTRUCTIONS_MODAL_SIZE)
+        victory_modal.fill(constants.BLACK)
+
+        text = self.fonts[1].render("VITÓRIA!", False, constants.GREEN)
+
+        victory_modal.blit(text,
+                           (constants.INSTRUCTIONS_MODAL_SIZE[0] // 2 - text.get_width() // 2,
+                            constants.INSTRUCTIONS_MODAL_SIZE[1] // 2 - text.get_height() // 2))
+
+        self.screen.blit(victory_modal, (constants.SCREEN_SIZE[0] // 2 - constants.INSTRUCTIONS_MODAL_SIZE[0] // 2,
+                                         constants.SCREEN_SIZE[1] // 2 - constants.INSTRUCTIONS_MODAL_SIZE[1] // 2))

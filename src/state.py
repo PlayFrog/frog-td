@@ -6,6 +6,8 @@ class GameState(Enum):
     SETUP_PHASE = 'setup'
     BUILDING_TOWER = 'building'
     RUNNING_ROUND = 'running'
+    WON = 'won'
+    LOST = 'lost'
 
     def __str__(self):
         if self == GameState.SETUP_PHASE:
@@ -14,6 +16,10 @@ class GameState(Enum):
             return "Construção"
         if self == GameState.RUNNING_ROUND:
             return "Round em execução"
+        if self == GameState.WON:
+            return "Vitória"
+        if self == GameState.LOST:
+            return "Derrota"
 
         raise NotImplementedError(f"__str__ not implemented for {self}")
 
