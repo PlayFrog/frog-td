@@ -161,7 +161,8 @@ class Grid:
         # Show radius of cell in mouse position
         if self.show_radius:
             row, col = self.get_cell_at(pg.mouse.get_pos())
-            self.grid[row][col].show_radius(surf)
+            if row and col:
+                self.grid[row][col].show_radius(surf)
 
     def get_cell_at(self, pos: tuple[int, int]) -> tuple[int, int]:
         x, y = pos
